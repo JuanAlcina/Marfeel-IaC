@@ -17,8 +17,6 @@ spec:
       containers:
       - name: echoserver-container
         image: gcr.io/google_containers/echoserver:1.4
-        ports:
-          - containerPort: 80
   replicas: 2
   selector:
     matchLabels:
