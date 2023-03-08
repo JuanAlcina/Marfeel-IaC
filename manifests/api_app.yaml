@@ -8,10 +8,10 @@ spec:
   source:
     repoURL: https://github.com/JuanAlcina/Marfeel-IaC.git
     targetRevision: HEAD
-    path: manifests/apps
+    path: manifests/apps/api
   destination:
     server: https://kubernetes.default.svc
-    namespace: api_app
+    namespace: apiapp
   syncPolicy:
     syncOptions:
     - CreateNamespace=true
