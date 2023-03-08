@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: apiapp-deployment
+  namespace: apiapp
   labels:
     app: apiapp
     type: api
@@ -16,6 +17,8 @@ spec:
       containers:
       - name: echoserver-container
         image: gcr.io/google_containers/echoserver:1.4
+        ports:
+          - containerPort: 80
   replicas: 2
   selector:
     matchLabels:
