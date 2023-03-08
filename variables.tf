@@ -16,6 +16,6 @@ variable vpc_name {
 
 variable cluster_name {
     type = string
-    default = "Marfeel-EKS"
+    default = "MarfeelEKS"
     description = "Name of the EKS cluster"
 }

@@ -1,3 +1,4 @@
+# VPC --------------------------------------------------------
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
@@ -23,6 +24,7 @@ module "vpc" {
   }
 }
 
+# EKS --------------------------------------------------------
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
 
@@ -55,4 +57,23 @@ module "eks" {
       desired_size = 1
     }
   }
+}
+
+# ArgoCD --------------------------------------------------------
+resource "kubectl_manifest" "namespace" {
+  depends_on = [
+    module.eks,
+  ]
+  for_each           = data.kubectl_file_documents.namespace.manifests
+  yaml_body          = each.value
+  override_namespace = "argocd"
+}
+
+resource "kubectl_manifest" "argocd" {
+  depends_on = [
+    kubectl_manifest.namespace,
+  ]
+  for_each           = data.kubectl_file_documents.argocd.manifests
+  yaml_body          = each.value
+  override_namespace = "argocd"
 }
