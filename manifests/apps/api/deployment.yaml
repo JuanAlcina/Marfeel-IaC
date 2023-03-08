@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apiapp-deployment
+  labels:
+    app: apiapp
+    type: api
+spec:
+  template:
+    metadata:
+      name: apiapp-pod
+      labels:
+        app: apiapp
+        type: api
+    spec:
+      containers:
+      - name: echoserver-container
+        image: gcr.io/google_containers/echoserver:1.4
+  replicas: 2
+  selector:
+    matchLabels:
+      type: api
