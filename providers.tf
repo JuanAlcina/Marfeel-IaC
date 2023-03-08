@@ -21,11 +21,7 @@ provider "kubectl" {
 
   exec {
     api_version = "client.authentication.k8s.io/v1alpha1"
-    command     = "aws-iam-authenticator"
-    args = [
-      "token",
-      "-i",
-      module.eks.cluster_id,
-    ]
+    command     = "aws"
+    args        = ["eks", "get-token", "--cluster-name", "${var.cluster_name}"]
   }
 }
