@@ -36,6 +36,17 @@ module "eks" {
     instance_types = var.instance_types
   }
 
+  cluster_security_group_additional_rules = {
+    egress_nodes_ephemeral_ports_tcp = {
+      description                = "To node 1025-65535"
+      protocol                   = "tcp"
+      from_port                  = 1025
+      to_port                    = 65535
+      type                       = "egress"
+      source_node_security_group = true
+    }
+  }
+
   eks_managed_node_groups = {
     one = {
       name = "node-group-1"
@@ -67,6 +78,15 @@ resource "kubectl_manifest" "argocd" {
     kubectl_manifest.namespace
   ]
   for_each           = data.kubectl_file_documents.argocd.manifests
+  yaml_body          = each.value
+  override_namespace = "argocd"
+}
+
+resource "kubectl_manifest" "application" {
+  depends_on = [
+    kubectl_manifest.argocd
+  ]
+  for_each           = data.kubectl_file_documents.application.manifests
   yaml_body          = each.value
   override_namespace = "argocd"
 }

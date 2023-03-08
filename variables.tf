@@ -30,7 +30,7 @@ variable cluster_version {
 }
 
 variable "instance_types" {
-    type = string
-    default = "m5.large"
+    type = list(string)
+    default = ["m5.large"]
     description = "Instance type of the workers in the cluster"
 }

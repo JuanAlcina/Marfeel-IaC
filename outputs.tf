@@ -1,3 +1,7 @@
+output region {
+  value = var.region
+  description = "AWS region to deploy resources"
+}
 # Cluster outputs --------------------------------------------------------
 output "cluster_id" {
   value = module.eks.cluster_id

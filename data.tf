@@ -5,3 +5,7 @@ data "kubectl_file_documents" "namespace" {
 data "kubectl_file_documents" "argocd" {
   content = file("${path.module}/manifests/install.yaml")
 }
+
+data "kubectl_file_documents" "application" {
+  content = file("${path.module}/manifests/api_app.yaml")
+}
