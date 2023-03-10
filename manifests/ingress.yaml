@@ -6,6 +6,12 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: instance
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    alb.ingress.kubernetes.io/healthcheck-port: '80'
+    alb.ingress.kubernetes.io/healthcheck-path: '/'
+    alb.ingress.kubernetes.io/actions.targets: >
+      {"type":"targetGroup","targetGroup":{"targetGroups":[{"serviceName":"api-service","servicePort":80}],"enableStickySession":false}},
+      {"type": "redirection", "redirection":{"port": "80", "protocol": "HTTP"}}
 spec:
   ingressClassName: alb
   rules:

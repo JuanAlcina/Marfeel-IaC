@@ -18,4 +18,4 @@ spec:
         image: gcr.io/google_containers/echoserver:1.4
         imagePullPolicy: Always
         ports:
-        - containerPort: 80
+        - containerPort: 32134
