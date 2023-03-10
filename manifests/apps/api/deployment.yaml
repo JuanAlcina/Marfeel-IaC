@@ -3,21 +3,19 @@ kind: Deployment
 metadata:
   name: apiapp-deployment
   namespace: apiapp
-  labels:
-    app: apiapp
-    type: api
 spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: api
+  replicas: 2
   template:
     metadata:
-      name: apiapp-pod
       labels:
-        app: apiapp
-        type: api
+        app.kubernetes.io/name: api
     spec:
       containers:
       - name: echoserver-container
         image: gcr.io/google_containers/echoserver:1.4
-  replicas: 2
-  selector:
-    matchLabels:
-      type: api
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80

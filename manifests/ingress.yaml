@@ -1,14 +1,22 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: marfeel-ingress
+  namespace: apiapp
   annotations:
-    ingress.kubernetes.io/rewrite-target: /
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: instance
 spec:
+  ingressClassName: alb
   rules:
   - http:
       paths:
-        - path: /api
-          backend:
-            serviceName: api-service
-            servicePort: 4200
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 80
+
+
