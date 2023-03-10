@@ -5,8 +5,8 @@ metadata:
   namespace: apiapp
 spec:
   ports:
-    - port: 4200
-      targetPort: 4200
+    - port: 80
+      targetPort: 80
       protocol: TCP
   type: NodePort
   selector:
