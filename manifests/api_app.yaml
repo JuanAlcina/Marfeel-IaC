@@ -2,9 +2,9 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: marfeel-apps
-  namespace: argocd
+  namespace: apiapp
 spec:
-  project: default
+  project: Marfeel
   source:
     repoURL: https://github.com/JuanAlcina/Marfeel-IaC.git
     targetRevision: HEAD

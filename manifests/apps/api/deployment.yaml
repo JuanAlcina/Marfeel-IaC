@@ -6,16 +6,16 @@ metadata:
 spec:
   selector:
     matchLabels:
-      type: api
+      app: api
   replicas: 2
   template:
     metadata:
       labels:
-        type: api
+        app: api
     spec:
       containers:
       - name: echoserver-container
         image: gcr.io/google_containers/echoserver:1.4
         imagePullPolicy: Always
         ports:
-        - containerPort: 80
+        - containerPort: 4200
