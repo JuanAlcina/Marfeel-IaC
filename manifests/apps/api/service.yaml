@@ -10,4 +10,4 @@ spec:
       protocol: TCP
   type: NodePort
   selector:
-    type: api
+    app: api
