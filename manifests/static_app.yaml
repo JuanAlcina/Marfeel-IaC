@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: api-app
-  namespace: apiapp
+  name: static-app
+  namespace: staticapp
 spec:
   project: default
   source:
     repoURL: https://github.com/JuanAlcina/Marfeel-IaC.git
     targetRevision: HEAD
-    path: manifests/apps/api
+    path: manifests/apps/static
   destination:
     server: https://kubernetes.default.svc
-    namespace: apiapp
+    namespace: staticapp
   syncPolicy:
     syncOptions:
     - CreateNamespace=true

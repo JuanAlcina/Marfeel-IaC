@@ -17,6 +17,13 @@ spec:
           service:
             name: api-service
             port:
-              number: 32134
+              number: 8080
+      - path: /statics.html
+        pathType: Prefix
+        backend:
+          service:
+            name: static-service
+            port:
+              number: 8080
 
 
