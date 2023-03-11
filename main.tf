@@ -245,3 +245,12 @@ resource "kubectl_manifest" "static_ingress" {
   yaml_body          = each.value
   override_namespace = "staticapp"
 }
+
+resource "kubectl_manifest" "custom_html" {
+  depends_on = [
+    kubectl_manifest.static_application
+  ]
+  for_each           = data.kubectl_file_documents.custom_html.manifests
+  yaml_body          = each.value
+  override_namespace = "staticapp"
+}
