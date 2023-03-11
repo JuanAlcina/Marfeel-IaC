@@ -16,6 +16,10 @@ data "kubectl_file_documents" "static_application" {
   content = file("${path.module}/manifests/static_app.yaml")
 }
 
-data "kubectl_file_documents" "ingress" {
-  content = file("${path.module}/manifests/ingress.yaml")
+data "kubectl_file_documents" "api_ingress" {
+  content = file("${path.module}/manifests/api_ingress.yaml")
+}
+
+data "kubectl_file_documents" "static_ingress" {
+  content = file("${path.module}/manifests/static_ingress.yaml")
 }

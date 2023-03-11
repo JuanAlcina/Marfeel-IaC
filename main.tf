@@ -228,12 +228,20 @@ resource "kubectl_manifest" "static_application" {
   override_namespace = "argocd"
 }
 
-resource "kubectl_manifest" "ingress" {
+resource "kubectl_manifest" "api_ingress" {
   depends_on = [
     kubectl_manifest.api_application,
-    kubectl_manifest.static_application
   ]
-  for_each           = data.kubectl_file_documents.ingress.manifests
+  for_each           = data.kubectl_file_documents.api_ingress.manifests
   yaml_body          = each.value
   override_namespace = "apiapp"
+}
+
+resource "kubectl_manifest" "static_ingress" {
+  depends_on = [
+    kubectl_manifest.static_application
+  ]
+  for_each           = data.kubectl_file_documents.static_ingress.manifests
+  yaml_body          = each.value
+  override_namespace = "staticapp"
 }
