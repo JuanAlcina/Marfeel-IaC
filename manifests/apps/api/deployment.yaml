@@ -7,7 +7,7 @@ spec:
   selector:
     matchLabels:
       app: api
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: echoserver-container
-        image: nginx:1.14.2
+        image: gcr.io/google_containers/echoserver:1.4
         imagePullPolicy: Always
         ports:
-        - containerPort: 80
+        - containerPort: 8080

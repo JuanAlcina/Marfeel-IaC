@@ -2,11 +2,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: staticapp-deployment
+  namespace: staticapp
 spec:
   selector:
     matchLabels:
       app: static
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -17,4 +18,4 @@ spec:
         image: nginx:1.14.2
         imagePullPolicy: Always
         ports:
-        - containerPort: 8080
+        - containerPort: 80
