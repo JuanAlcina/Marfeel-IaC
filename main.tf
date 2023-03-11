@@ -216,7 +216,7 @@ resource "kubectl_manifest" "api_application" {
   ]
   for_each           = data.kubectl_file_documents.api_application.manifests
   yaml_body          = each.value
-  override_namespace = "argocd"
+  override_namespace = "apiapp"
 }
 
 resource "kubectl_manifest" "static_application" {
@@ -225,7 +225,7 @@ resource "kubectl_manifest" "static_application" {
   ]
   for_each           = data.kubectl_file_documents.static_application.manifests
   yaml_body          = each.value
-  override_namespace = "argocd"
+  override_namespace = "staticapp"
 }
 
 resource "kubectl_manifest" "api_ingress" {
