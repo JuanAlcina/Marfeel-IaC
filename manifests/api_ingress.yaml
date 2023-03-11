@@ -17,6 +17,6 @@ spec:
           service:
             name: api-service
             port:
-              number: 4200
+              number: 8080
 
 
