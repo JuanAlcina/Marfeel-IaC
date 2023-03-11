@@ -210,14 +210,14 @@ resource "kubectl_manifest" "argocd" {
   override_namespace = "argocd"
 }
 
-/*resource "kubectl_manifest" "api_application" {
+resource "kubectl_manifest" "api_application" {
   depends_on = [
     kubectl_manifest.argocd
   ]
   for_each           = data.kubectl_file_documents.api_application.manifests
   yaml_body          = each.value
   override_namespace = "argocd"
-}*/
+}
 
 resource "kubectl_manifest" "static_application" {
   depends_on = [
@@ -228,14 +228,14 @@ resource "kubectl_manifest" "static_application" {
   override_namespace = "argocd"
 }
 
-/*resource "kubectl_manifest" "api_ingress" {
+resource "kubectl_manifest" "api_ingress" {
   depends_on = [
     kubectl_manifest.api_application,
   ]
   for_each           = data.kubectl_file_documents.api_ingress.manifests
   yaml_body          = each.value
   override_namespace = "apiapp"
-}*/
+}
 
 resource "kubectl_manifest" "static_ingress" {
   depends_on = [

@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: static-ingress
+  name: static-ingress1
   namespace: staticapp
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
