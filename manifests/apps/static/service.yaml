@@ -5,8 +5,8 @@ metadata:
   namespace: staticapp
 spec:
   ports:
-    - port: 8080
-      targetPort: 8080
+    - port: 4200
+      targetPort: 4200
       protocol: TCP
   type: NodePort
   selector:
