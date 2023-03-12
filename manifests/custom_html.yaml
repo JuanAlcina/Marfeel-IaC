@@ -4,7 +4,7 @@ metadata:
   name: custom-html-configmap
   namespace: staticapp
 data:
-  index.html: |
+  statics.html: |
     <html>
     <h1>Welcome</h1>
     </br>

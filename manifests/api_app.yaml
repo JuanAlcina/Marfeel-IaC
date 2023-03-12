@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/JuanAlcina/Marfeel-IaC.git
-    targetRevision: HEAD
+    targetRevision: ${env}
     path: manifests/apps/api
   destination:
     server: https://kubernetes.default.svc

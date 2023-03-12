@@ -1,47 +1,50 @@
-# ------------------------------------------------------------
-# Locals -----------------------------------------------------
+# ----------------------------------------------------------------------------------------------
+# Locals ---------------------------------------------------------------------------------------
 locals {
   account_id = data.aws_caller_identity.current.account_id
 }
 
-# ------------------------------------------------------------
-# VPC --------------------------------------------------------
+# ----------------------------------------------------------------------------------------------
+# VPC ------------------------------------------------------------------------------------------
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+  count   = length(var.env_names)
+  source  = "terraform-aws-modules/vpc/aws"
   version = "3.14.2"
 
-  name = var.vpc_name
-  cidr = "10.0.0.0/16"
+  name = "${var.vpc_name}-${var.env_names[count.index]}"
+  cidr = var.vpc_cidrs[count.index]
 
-  azs             = ["us-east-1a", "us-east-1b"]
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
-  public_subnets  = ["10.0.4.0/24", "10.0.5.0/24"]
+  azs             = var.vpc_azs
+  private_subnets = var.vpc_private_subnets[count.index]
+  public_subnets  = var.vpc_public_subnets[count.index]
 
   enable_nat_gateway = true
   single_nat_gateway   = true
   enable_dns_hostnames = true
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    "kubernetes.io/cluster/${var.cluster_name}-${var.env_names[count.index]}" = "shared"
     "kubernetes.io/role/elb"                      = 1
   }
   private_subnet_tags = {
-    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-    "kubernetes.io/role/internal-elb"             = 1
+    "kubernetes.io/cluster/${var.cluster_name}-${var.env_names[count.index]}" = "shared"
+    "kubernetes.io/role/internal-elb"                                         = 1
   }
 }
 
-# ------------------------------------------------------------
-# EKS --------------------------------------------------------
+# ----------------------------------------------------------------------------------------------
+# EKS ------------------------------------------------------------------------------------------
 module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
+  providers = {kubernetes = kubernetes.dev}
+  count                           = length(var.env_names)
+  source                          = "terraform-aws-modules/eks/aws"
   version                         = "18.29.1"
-  cluster_name    = var.cluster_name
-  cluster_version = var.cluster_version
+  cluster_name                    = "${var.cluster_name}-${var.env_names[count.index]}"
+  cluster_version                 = var.cluster_version
   cluster_endpoint_private_access = true
-  cluster_endpoint_public_access = true
+  cluster_endpoint_public_access  = true
   enable_irsa                     = true
-  
+
   cluster_addons = {
     coredns = {
       resolve_conflicts = "OVERWRITE"
@@ -52,8 +55,8 @@ module "eks" {
     }
   }
 
-  vpc_id                         = module.vpc.vpc_id
-  subnet_ids                     = module.vpc.private_subnets
+  vpc_id     = module.vpc[count.index].vpc_id
+  subnet_ids = module.vpc[count.index].private_subnets
 
   manage_aws_auth_configmap = true
 
@@ -106,16 +109,13 @@ module "eks" {
 
   eks_managed_node_groups = {
     marfeel_nodes = {
-      ami_type      = "BOTTLEROCKET_x86_64"
-      platform      = "bottlerocket"
-      min_size      = 1
-      max_size      = 2
-      desired_size  = 1
-      capacity_type = "SPOT"
-
-      # this will get added to what AWS provides
+      ami_type             = "BOTTLEROCKET_x86_64"
+      platform             = "bottlerocket"
+      min_size             = 1
+      max_size             = 2
+      desired_size         = 1
+      capacity_type        = "SPOT"
       bootstrap_extra_args = <<-EOT
-      # extra args added
       [settings.kernel]
       lockdown = "integrity"
       EOT
@@ -123,38 +123,44 @@ module "eks" {
   }
 }
 
-# Load Balancer Controller --------------------------------------
+# ----------------------------------------------------------------------------------------------
+# Load Balancer Controller ---------------------------------------------------------------------
 module "lb_role" {
-  depends_on = [ module.eks ]
-  source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  role_name = "aws-load-balancer-controller"
+  count                                  = length(var.env_names)
+  depends_on                             = [module.eks]
+  source                                 = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  role_name                              = "aws-load-balancer-controller"
   attach_load_balancer_controller_policy = true
   oidc_providers = {
     main = {
-      provider_arn               = module.eks.oidc_provider_arn
+      provider_arn               = module.eks[count.index].oidc_provider_arn
       namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
     }
   }
 }
 
 resource "kubernetes_service_account" "service-account" {
-  depends_on = [ module.lb_role ]
+  provider = kubernetes.dev
+  count      = length(var.env_names)
+  depends_on = [module.lb_role]
   metadata {
-    name = "aws-load-balancer-controller"
+    name      = "aws-load-balancer-controller"
     namespace = "kube-system"
     labels = {
-        "app.kubernetes.io/name"= "aws-load-balancer-controller"
-        "app.kubernetes.io/component"= "controller"
+      "app.kubernetes.io/name"      = "aws-load-balancer-controller"
+      "app.kubernetes.io/component" = "controller"
     }
     annotations = {
-      "eks.amazonaws.com/role-arn" = module.lb_role.iam_role_arn
+      "eks.amazonaws.com/role-arn"               = module.lb_role[count.index].iam_role_arn
       "eks.amazonaws.com/sts-regional-endpoints" = "true"
     }
   }
 }
 
 resource "helm_release" "lb" {
-  depends_on = [ kubernetes_service_account.service-account ]
+  provider = helm.dev
+  count      = length(var.env_names)
+  depends_on = [kubernetes_service_account.service-account]
   name       = "aws-load-balancer-controller"
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
@@ -167,7 +173,7 @@ resource "helm_release" "lb" {
 
   set {
     name  = "vpcId"
-    value = module.vpc.vpc_id
+    value = module.vpc[count.index].vpc_id
   }
 
   set {
@@ -187,70 +193,69 @@ resource "helm_release" "lb" {
 
   set {
     name  = "clusterName"
-    value = var.cluster_name
+    value = "${var.cluster_name}-${var.env_names[count.index]}"
   }
 }
 
-# ArgoCD --------------------------------------------------------
+# ----------------------------------------------------------------------------------------------
+# ArgoCD ---------------------------------------------------------------------------------------
+
+# Dev ------------------------------------------------------------------------------------------
 resource "kubectl_manifest" "namespace" {
-  depends_on = [
-    module.eks
-  ]
+  provider = kubectl.dev
+  depends_on         = [module.eks]
   for_each           = data.kubectl_file_documents.namespace.manifests
   yaml_body          = each.value
   override_namespace = "argocd"
 }
 
 resource "kubectl_manifest" "argocd" {
-  depends_on = [
-    kubectl_manifest.namespace
-  ]
+  provider = kubectl.dev
+  depends_on         = [kubectl_manifest.namespace]
   for_each           = data.kubectl_file_documents.argocd.manifests
   yaml_body          = each.value
   override_namespace = "argocd"
 }
 
-resource "kubectl_manifest" "api_application" {
-  depends_on = [
-    kubectl_manifest.argocd
-  ]
-  for_each           = data.kubectl_file_documents.api_application.manifests
+resource "kubectl_manifest" "dev_api_application" {
+  provider = kubectl.dev
+  depends_on         = [kubectl_manifest.argocd]
+  for_each           = data.kubectl_file_documents.dev_api_application.manifests
   yaml_body          = each.value
   override_namespace = "argocd"
 }
 
-resource "kubectl_manifest" "static_application" {
-  depends_on = [
-    kubectl_manifest.argocd
-  ]
-  for_each           = data.kubectl_file_documents.static_application.manifests
+resource "kubectl_manifest" "dev_static_application" {
+  provider = kubectl.dev
+  depends_on         = [kubectl_manifest.argocd]
+  for_each           = data.kubectl_file_documents.dev_static_application.manifests
   yaml_body          = each.value
   override_namespace = "argocd"
 }
 
-resource "kubectl_manifest" "api_ingress" {
-  depends_on = [
-    kubectl_manifest.api_application,
-  ]
+resource "kubectl_manifest" "dev_api_ingress" {
+  provider = kubectl.dev
+  depends_on         = [kubectl_manifest.dev_api_application]
   for_each           = data.kubectl_file_documents.api_ingress.manifests
   yaml_body          = each.value
   override_namespace = "apiapp"
 }
 
-resource "kubectl_manifest" "static_ingress" {
-  depends_on = [
-    kubectl_manifest.static_application
-  ]
+resource "kubectl_manifest" "dev_static_ingress" {
+  provider = kubectl.dev
+  depends_on         = [kubectl_manifest.dev_static_application]
   for_each           = data.kubectl_file_documents.static_ingress.manifests
   yaml_body          = each.value
   override_namespace = "staticapp"
 }
 
 resource "kubectl_manifest" "custom_html" {
-  depends_on = [
-    kubectl_manifest.static_application
-  ]
+  provider = kubectl.dev
+  depends_on         = [kubectl_manifest.dev_static_application]
   for_each           = data.kubectl_file_documents.custom_html.manifests
   yaml_body          = each.value
   override_namespace = "staticapp"
 }
+
+# Stage ----------------------------------------------------------------------------------------
+# Production -----------------------------------------------------------------------------------
