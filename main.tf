@@ -220,7 +220,7 @@ resource "kubectl_manifest" "dev_argocd" {
 resource "kubectl_manifest" "dev_api_application" {
   provider = kubectl.dev
   depends_on         = [kubectl_manifest.dev_argocd]
-  for_each           = data.kubectl_file_documents.api_application.manifests
+  for_each           = data.kubectl_file_documents.dev_api_application.manifests
   yaml_body          = each.value
   override_namespace = "argocd"
 }
@@ -228,7 +228,7 @@ resource "kubectl_manifest" "dev_api_application" {
 resource "kubectl_manifest" "dev_static_application" {
   provider = kubectl.dev
   depends_on         = [kubectl_manifest.argocd]
-  for_each           = data.kubectl_file_documents.static_application.manifests
+  for_each           = data.kubectl_file_documents.dev_static_application.manifests
   yaml_body          = each.value
   override_namespace = "argocd"
 }
@@ -245,6 +245,14 @@ resource "kubectl_manifest" "dev_static_ingress" {
   provider = kubectl.dev
   depends_on         = [kubectl_manifest.dev_static_application]
   for_each           = data.kubectl_file_documents.static_ingress.manifests
+  yaml_body          = each.value
+  override_namespace = "staticapp"
+}
+
+resource "kubectl_manifest" "dev_custom_html" {
+  provider = kubectl.dev
+  depends_on         = [kubectl_manifest.dev_static_application]
+  for_each           = data.kubectl_file_documents.dev_custom_html_file.manifests
   yaml_body          = each.value
   override_namespace = "staticapp"
 }
@@ -269,7 +277,7 @@ resource "kubectl_manifest" "stage_argocd" {
 resource "kubectl_manifest" "stage_api_application" {
   provider = kubectl.stage
   depends_on         = [kubectl_manifest.argocd]
-  for_each           = data.kubectl_file_documents.api_application.manifests
+  for_each           = data.kubectl_file_documents.stage_api_application.manifests
   yaml_body          = each.value
   override_namespace = "argocd"
 }
@@ -277,14 +285,14 @@ resource "kubectl_manifest" "stage_api_application" {
 resource "kubectl_manifest" "stage_static_application" {
   provider = kubectl.stage
   depends_on         = [kubectl_manifest.argocd]
-  for_each           = data.kubectl_file_documents.static_application.manifests
+  for_each           = data.kubectl_file_documents.stage_static_application.manifests
   yaml_body          = each.value
   override_namespace = "argocd"
 }
 
 resource "kubectl_manifest" "stage_api_ingress" {
   provider = kubectl.stage
-  depends_on         = [kubectl_manifest.dev_api_application]
+  depends_on         = [kubectl_manifest.stage_api_application]
   for_each           = data.kubectl_file_documents.api_ingress.manifests
   yaml_body          = each.value
   override_namespace = "apiapp"
@@ -292,11 +300,20 @@ resource "kubectl_manifest" "stage_api_ingress" {
 
 resource "kubectl_manifest" "stage_static_ingress" {
   provider = kubectl.stage
-  depends_on         = [kubectl_manifest.dev_static_application]
+  depends_on         = [kubectl_manifest.stage_static_application]
   for_each           = data.kubectl_file_documents.static_ingress.manifests
   yaml_body          = each.value
   override_namespace = "staticapp"
-}*/
+}
+
+resource "kubectl_manifest" "stage_custom_html" {
+  provider = kubectl.stage
+  depends_on         = [kubectl_manifest.stage_static_application]
+  for_each           = data.kubectl_file_documents.stage_custom_html_file.manifests
+  yaml_body          = each.value
+  override_namespace = "staticapp"
+}
+
 
 # Production -----------------------------------------------------------------------------------
 /*resource "kubectl_manifest" "production_namespace" {
@@ -333,7 +350,7 @@ resource "kubectl_manifest" "production_static_application" {
 
 resource "kubectl_manifest" "production_api_ingress" {
   provider = kubectl.production
-  depends_on         = [kubectl_manifest.dev_api_application]
+  depends_on         = [kubectl_manifest.production_api_application]
   for_each           = data.kubectl_file_documents.api_ingress.manifests
   yaml_body          = each.value
   override_namespace = "apiapp"
@@ -341,8 +358,16 @@ resource "kubectl_manifest" "production_api_ingress" {
 
 resource "kubectl_manifest" "production_static_ingress" {
   provider = kubectl.production
-  depends_on         = [kubectl_manifest.dev_static_application]
+  depends_on         = [kubectl_manifest.production_static_application]
   for_each           = data.kubectl_file_documents.static_ingress.manifests
+  yaml_body          = each.value
+  override_namespace = "staticapp"
+}
+
+resource "kubectl_manifest" "production_custom_html" {
+  provider = kubectl.production
+  depends_on         = [kubectl_manifest.production_static_application]
+  for_each           = data.kubectl_file_documents.production_custom_html_file.manifests
   yaml_body          = each.value
   override_namespace = "staticapp"
 }*/
