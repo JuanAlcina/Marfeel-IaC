@@ -12,7 +12,7 @@ variable "region" {
 
 variable "env_names" {
   type        = list(string)
-  default     = ["dev", "stage"]
+  default     = ["dev", "stage", "production"]
   description = "List of environments"
 }
 

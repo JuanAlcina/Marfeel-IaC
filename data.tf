@@ -72,7 +72,7 @@ data "kubectl_file_documents" "stage_custom_html_file" {
 
 # --------------------------------------------------------------------------
 # Production ---------------------------------------------------------------
-/*data "kubectl_file_documents" "production_api_application" {
+data "kubectl_file_documents" "production_api_application" {
   content = data.template_file.api_app[2].rendered
 }
 
@@ -82,4 +82,4 @@ data "kubectl_file_documents" "production_static_application" {
 
 data "kubectl_file_documents" "production_custom_html_file" {
   content = data.template_file.custom_html[2].rendered
-}*/
+}
