@@ -1,8 +1,12 @@
+# ----------------------------------------------------------------------------------------------
+# AWS ------------------------------------------------------------------------------------------
 provider "aws" {
   region  = var.region
   profile = var.profile
 }
 
+# ----------------------------------------------------------------------------------------------
+# Kubernetes -----------------------------------------------------------------------------------
 provider "kubernetes" {
   alias                  = "dev"
   host                   = module.eks[0].cluster_endpoint
@@ -25,7 +29,7 @@ provider "kubernetes" {
   }
 }
 
-provider "kubernetes" {
+/*provider "kubernetes" {
   alias                  = "production"
   host                   = module.eks[2].cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks[2].cluster_certificate_authority_data)
@@ -34,8 +38,10 @@ provider "kubernetes" {
     args        = ["eks", "get-token", "--cluster-name", "${var.cluster_name}-${var.env_names[2]}"]
     command     = "aws"
   }
-}
+}*/
 
+# ----------------------------------------------------------------------------------------------
+# Kubectl --------------------------------------------------------------------------------------
 provider "kubectl" {
   alias                  = "dev"
   apply_retry_count      = 2
@@ -64,7 +70,7 @@ provider "kubectl" {
   }
 }
 
-provider "kubectl" {
+/*provider "kubectl" {
   alias                  = "production"
   apply_retry_count      = 2
   host                   = module.eks[2].cluster_endpoint
@@ -76,8 +82,10 @@ provider "kubectl" {
     command     = "aws"
     args        = ["eks", "get-token", "--cluster-name", "${var.cluster_name}-${var.env_names[2]}"]
   }
-}
+}*/
 
+# ----------------------------------------------------------------------------------------------
+# Helm -----------------------------------------------------------------------------------------
 provider "helm" {
   alias = "dev"
   kubernetes {
@@ -104,7 +112,7 @@ provider "helm" {
   }
 }
 
-provider "helm" {
+/*provider "helm" {
   alias = "production"
   kubernetes {
     host                   = module.eks[2].cluster_endpoint
@@ -115,4 +123,4 @@ provider "helm" {
       command     = "aws"
     }
   }
-}
+}*/
