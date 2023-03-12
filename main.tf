@@ -296,7 +296,7 @@ resource "kubectl_manifest" "stage_static_ingress" {
   for_each           = data.kubectl_file_documents.static_ingress.manifests
   yaml_body          = each.value
   override_namespace = "staticapp"
-}
+}*/
 
 # Production -----------------------------------------------------------------------------------
 /*resource "kubectl_manifest" "production_namespace" {

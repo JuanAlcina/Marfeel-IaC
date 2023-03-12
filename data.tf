@@ -43,6 +43,6 @@ data "template_file" "static_app" {
 }
 
 
-data "kubectl_file_documents" "custom_html" {
+/*data "kubectl_file_documents" "custom_html" {
   content = file("${path.module}/manifests/custom_html.yaml")
-}
+}*/
