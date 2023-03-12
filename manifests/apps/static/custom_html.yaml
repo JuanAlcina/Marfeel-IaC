@@ -6,7 +6,7 @@ metadata:
 data:
   statics.html: |
     <html>
-    <h1>Welcome</h1>
     </br>
-    <h1>Hi! This is a configmap Index file testing</h1>
+    <h1>Welcome to Marfeel App!</h1>
+    <h1>You are currently in the <b>Dev</b> environment</h1>
     </html
