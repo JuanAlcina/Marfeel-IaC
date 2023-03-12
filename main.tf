@@ -644,7 +644,7 @@ resource "helm_release" "production_lb" {
 
 resource "kubectl_manifest" "production_namespace" {
   provider = kubectl.production
-  depends_on         = [module.eks]
+  depends_on         = [module.production_eks]
   for_each           = data.kubectl_file_documents.namespace.manifests
   yaml_body          = each.value
   override_namespace = "argocd"
@@ -661,7 +661,7 @@ resource "kubectl_manifest" "production_argocd" {
 resource "kubectl_manifest" "production_api_application" {
   provider = kubectl.production
   depends_on         = [kubectl_manifest.production_argocd]
-  for_each           = data.kubectl_file_documents.api_application.manifests
+  for_each           = data.kubectl_file_documents.production_api_application.manifests
   yaml_body          = each.value
   override_namespace = "argocd"
 }
@@ -669,7 +669,7 @@ resource "kubectl_manifest" "production_api_application" {
 resource "kubectl_manifest" "production_static_application" {
   provider = kubectl.production
   depends_on         = [kubectl_manifest.production_argocd]
-  for_each           = data.kubectl_file_documents.static_application.manifests
+  for_each           = data.kubectl_file_documents.production_static_application.manifests
   yaml_body          = each.value
   override_namespace = "argocd"
 }
