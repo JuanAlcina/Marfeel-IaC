@@ -56,7 +56,7 @@ variable "vpc_public_subnets" {
 # EKS variables ------------------------------------------------------------
 variable "cluster_name" {
   type        = string
-  default     = "MarfeelEKS"
+  #default     = "MarfeelEKS"
   description = "Name of the EKS cluster"
 }
 
