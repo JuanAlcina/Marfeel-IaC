@@ -249,13 +249,13 @@ resource "kubectl_manifest" "dev_static_ingress" {
   override_namespace = "staticapp"
 }
 
-resource "kubectl_manifest" "custom_html" {
+/*resource "kubectl_manifest" "custom_html" {
   provider = kubectl.dev
   depends_on         = [kubectl_manifest.dev_static_application]
   for_each           = data.kubectl_file_documents.custom_html.manifests
   yaml_body          = each.value
   override_namespace = "staticapp"
-}
+}*/
 
 # Stage ----------------------------------------------------------------------------------------
 # Production -----------------------------------------------------------------------------------

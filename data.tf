@@ -44,6 +44,6 @@ data "kubectl_file_documents" "static_ingress" {
   content = file("${path.module}/manifests/static_ingress.yaml")
 }
 
-data "kubectl_file_documents" "custom_html" {
+/*data "kubectl_file_documents" "custom_html" {
   content = file("${path.module}/manifests/custom_html.yaml")
-}
+}*/
