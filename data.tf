@@ -34,6 +34,14 @@ data "template_file" "static_app" {
   }
 }
 
+data "template_file" "custom_html" {
+  count    = length(var.env_names)
+  template = file("${path.module}/manifests/static/custom_html.yaml")
+  vars = {
+    env = "${var.env_names[count.index]}"
+  }
+}
+
 # --------------------------------------------------------------------------
 # Dev ----------------------------------------------------------------------
 data "kubectl_file_documents" "dev_api_application" {
@@ -42,6 +50,10 @@ data "kubectl_file_documents" "dev_api_application" {
 
 data "kubectl_file_documents" "dev_static_application" {
   content = data.template_file.static_app[0].rendered
+}
+
+data "kubectl_file_documents" "dev_custom_html_file" {
+  content = data.template_file.custom_html[0].rendered
 }
 
 # --------------------------------------------------------------------------
@@ -54,6 +66,10 @@ data "kubectl_file_documents" "stage_static_application" {
   content = data.template_file.static_app[1].rendered
 }
 
+data "kubectl_file_documents" "stage_custom_html_file" {
+  content = data.template_file.custom_html[1].rendered
+}
+
 # --------------------------------------------------------------------------
 # Production ---------------------------------------------------------------
 data "kubectl_file_documents" "production_api_application" {
@@ -62,4 +78,8 @@ data "kubectl_file_documents" "production_api_application" {
 
 data "kubectl_file_documents" "production_static_application" {
   content = data.template_file.static_app[2].rendered
+}
+
+data "kubectl_file_documents" "production_custom_html_file" {
+  content = data.template_file.custom_html[2].rendered
 }
