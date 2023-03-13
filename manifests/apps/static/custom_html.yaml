@@ -8,5 +8,5 @@ data:
     <html>
     </br>
     <h1>Welcome to Marfeel App!</h1>
-    <h1>You are currently in the ${env} environment. This is a test in main</h1>
+    <h1>This is the Marfeel technical test. This is a test in main</h1>
     </html
