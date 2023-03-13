@@ -36,7 +36,7 @@ data "template_file" "static_app" {
 
 data "template_file" "custom_html" {
   count    = length(var.env_names)
-  template = file("${path.module}/manifests/static/custom_html.yaml")
+  template = file("${path.module}/manifests/apps/static/custom_html.yaml")
   vars = {
     env = "${var.env_names[count.index]}"
   }
